@@ -3,6 +3,14 @@ from arpa import ARPA
 
 class BaixarTituloRPA(ARPA):
     def trabalhar(self):
+        if self.coletando:
+            print("--- COLETA INICIAL DOS STATUS ---")
+            print("Deixe os status visíveis na tela para recortar o Verde, Vermelho e Cinza.")
+            self.clicar("Status Verde", 1, esperar_pixel=lambda p: p[1] > p[0] + 30 and p[1] > p[2] + 30 and p[1] > 100)
+            self.clicar("Status Vermelho", 1, esperar_pixel=lambda p: p[0] > p[1] + 30 and p[0] > p[2] + 30 and p[0] > 100)
+            self.clicar("Status Cinza", 1)
+            print("--- COLETA DOS STATUS CONCLUÍDA ---")
+
         with open("titulos2026.csv", "r", encoding="utf-8") as fd:
             linhas = list(csv.reader(fd))
             
@@ -43,13 +51,16 @@ class BaixarTituloRPA(ARPA):
             self.clicar("Aplicar filtro", 10)
 
             # Verifica se o título ficou com o status Verde
-            # Se não for verde (não encontrar o pixel), retorna False
-            status_verde = self.clicar(
-                "Status Verde", 3, 
-                esperar_pixel=lambda p: p[1] > p[0] + 30 and p[1] > p[2] + 30 and p[1] > 100
-            )
+            # Se estiver coletando, pula essa checagem para não pedir o recorte de novo
+            if self.coletando:
+                status_verde = True
+            else:
+                status_verde = self.clicar(
+                    "Status Verde", 3, 
+                    esperar_pixel=lambda p: p[1] > p[0] + 30 and p[1] > p[2] + 30 and p[1] > 100
+                )
             
-            if not status_verde and not self.coletando:
+            if not status_verde:
                 # Verifica se o título ficou com o status Vermelho
                 status_vermelho = self.clicar(
                     "Status Vermelho", 1, 
@@ -59,8 +70,13 @@ class BaixarTituloRPA(ARPA):
                 if status_vermelho:
                     campos.insert(0, 'B')
                 else:
-                    # Se NÃO for verde nem vermelho, marca com 'P', salva e vai pro próximo!
-                    campos.insert(0, 'P')
+                    # Verifica se ficou Cinza
+                    status_cinza = self.clicar("Status Cinza", 1)
+                    if status_cinza:
+                        campos.insert(0, 'C') # Letra para cinza
+                    else:
+                        # Se NÃO for verde, nem vermelho, nem cinza, marca com 'P'
+                        campos.insert(0, 'P')
                     
                 with open("titulos2026.csv", "w", encoding="utf-8", newline='') as fd_out:
                     csv.writer(fd_out, quoting=csv.QUOTE_ALL).writerows(linhas)
