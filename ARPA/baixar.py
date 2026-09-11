@@ -1,4 +1,5 @@
 import csv
+import datetime
 from arpa import ARPA
 
 class BaixarTituloRPA(ARPA):
@@ -15,6 +16,11 @@ class BaixarTituloRPA(ARPA):
             linhas = list(csv.reader(fd))
             
         for n, campos in enumerate(linhas, 1):
+            agora = datetime.datetime.now()
+            if agora.hour == 3 and agora.minute >= 50:
+                print("Passou das 3:50 da manhã. Parando a execução.")
+                break
+            
             if not campos or campos[0] in ('X', 'P', 'B'):
                 print(f"Linha {n} já processada (marcada com {campos[0]}). Pulando...")
                 continue
@@ -73,7 +79,7 @@ class BaixarTituloRPA(ARPA):
                     # Verifica se ficou Cinza
                     status_cinza = self.clicar("Status Cinza", 1)
                     if status_cinza:
-                        campos.insert(0, 'C') # Letra para cinza
+                        campos.insert(0, 'P') # Letra para cinza
                     else:
                         # Se NÃO for verde, nem vermelho, nem cinza, marca com 'P'
                         campos.insert(0, 'P')
