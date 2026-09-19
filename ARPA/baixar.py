@@ -12,9 +12,9 @@ class BaixarTituloRPA(ARPA):
             self.clicar("Status Cinza", 1)
             print("--- COLETA DOS STATUS CONCLUÍDA ---")
 
-        with open("titulos2026.csv", "r", encoding="utf-8") as fd:
+        with open("103baixas.csv", "r", encoding="utf-8") as fd:
             linhas = list(csv.reader(fd))
-            
+
         for n, campos in enumerate(linhas, 1):
             agora = datetime.datetime.now()
             if agora.hour == 3 and agora.minute >= 50:
@@ -39,12 +39,12 @@ class BaixarTituloRPA(ARPA):
             self.clicar("Expressão de filtro", 5)
 
             self.escrever(
-                f'E1_FILIAL== "{campos[0]}"'
+                f'E1_FILIAL== "{campos[0]}"' #Filial
                 # f' .AND. E1_LOJA == "{campos[9]}"'
-                f' .AND. E1_PREFIXO == "{campos[2]}"'
-                f' .AND. alltrim(E1_NUM) == "{campos[3]}"'
-                f' .AND. alltrim(E1_TIPO) == "{campos[5]}"'
-                f' .AND. E1_VALOR == {campos[18].replace(",", "").strip()}'
+                f' .AND. E1_PREFIXO == "{campos[2]}"' #Prefixo
+                f' .AND. alltrim(E1_NUM) == "{campos[3]}"' #Número Titulo
+                f' .AND. alltrim(E1_TIPO) == "{campos[5]}"' #Tipo
+                f' .AND. E1_VALOR == {campos[18].replace(",", "").strip()}' #Valor
                 , .5)
 
                 #001002" .AND. E1_NUM== "000076195" .AND. E1_VALOR == 820.49 .AND. E1_TIPO== "NF "
@@ -84,7 +84,7 @@ class BaixarTituloRPA(ARPA):
                         # Se NÃO for verde, nem vermelho, nem cinza, marca com 'P'
                         campos.insert(0, 'P')
                     
-                with open("titulos2026.csv", "w", encoding="utf-8", newline='') as fd_out:
+                with open("103baixas.csv", "w", encoding="utf-8", newline='') as fd_out:
                     csv.writer(fd_out, quoting=csv.QUOTE_ALL).writerows(linhas)
                 self.recoletar()
                 continue
@@ -109,7 +109,7 @@ class BaixarTituloRPA(ARPA):
             campos.insert(0, 'X')
 
             # Salva o progresso no próprio arquivo CSV
-            with open("titulos2026.csv", "w", encoding="utf-8", newline='') as fd_out:
+            with open("103baixas.csv", "w", encoding="utf-8", newline='') as fd_out:
                 csv.writer(fd_out, quoting=csv.QUOTE_ALL).writerows(linhas)
 
 if __name__ == '__main__':
